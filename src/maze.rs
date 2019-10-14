@@ -46,6 +46,18 @@ impl Maze {
         result
     }
 
+    pub fn rows(&self) -> Vec<Vec<Cell>> {
+        let mut result = vec![];
+        for y in 0..self.height {
+            let mut row = vec![];
+            for x in 0..self.width {
+                row.push(Cell::new(x, y));
+            }
+            result.push(row);
+        }
+        result
+    }
+
     pub fn neighbours(&self, cell: &Cell) -> HashMap<Direction, Cell> {
         let mut result = HashMap::new();
         if cell.y > 0 {
@@ -149,6 +161,21 @@ mod spec {
                 Cell::new(0, 3),
                 Cell::new(1, 3),
                 Cell::new(2, 3),
+            ]
+        )
+    }
+
+    #[test]
+    fn maze_provides_rows() {
+        let maze = Maze::new(3, 4);
+
+        assert_eq!(
+            maze.rows(),
+            vec![
+                vec![Cell::new(0, 0), Cell::new(1, 0), Cell::new(2, 0),],
+                vec![Cell::new(0, 1), Cell::new(1, 1), Cell::new(2, 1),],
+                vec![Cell::new(0, 2), Cell::new(1, 2), Cell::new(2, 2),],
+                vec![Cell::new(0, 3), Cell::new(1, 3), Cell::new(2, 3),]
             ]
         )
     }

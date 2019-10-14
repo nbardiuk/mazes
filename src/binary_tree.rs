@@ -1,5 +1,6 @@
 use crate::maze::Direction::{East, North};
 use crate::maze::Maze;
+use crate::rand::sample;
 use rand::{thread_rng, Rng};
 
 pub struct BinaryTree;
@@ -14,9 +15,8 @@ impl BinaryTree {
                 .map(|(_, neighbour)| neighbour)
                 .collect::<Vec<_>>();
 
-            if !neighbours.is_empty() {
-                let mut rand_neighbour = rng.gen_range(0, neighbours.len());
-                maze.link(&cell, &neighbours[rand_neighbour]);
+            if let Some(neighbour) = sample(rng, &neighbours) {
+                maze.link(&cell, &neighbour);
             }
         }
         maze

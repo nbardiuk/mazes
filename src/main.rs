@@ -1,9 +1,11 @@
-use binary_tree::BinaryTree;
 use maze::Maze;
+use sidewinder::Sidewinder;
 
 mod binary_tree;
 mod maze;
+mod rand;
+mod sidewinder;
 
 fn main() {
-    print!("{}", BinaryTree::on(Maze::new(20, 8)));
+    println!("{}", Sidewinder::on(Maze::new(27, 8)));
 }
