@@ -1,12 +1,12 @@
 use crate::maze::Direction::{East, North};
 use crate::maze::Maze;
-use crate::rand::sample;
+use rand::seq::SliceRandom;
 use rand::{thread_rng, Rng};
 
 pub struct Sidewinder;
 impl Sidewinder {
     pub fn on(mut maze: Maze) -> Maze {
-        let mut rng = thread_rng();
+        let rng = &mut thread_rng();
         for row in maze.rows() {
             let mut run = vec![];
             for cell in row {
@@ -19,7 +19,7 @@ impl Sidewinder {
                 let should_close_out = at_eastern_boundary || (!at_northen_boundary && rng.gen());
 
                 if should_close_out {
-                    if let Some(member) = sample(rng, &run) {
+                    if let Some(member) = run.choose(rng) {
                         if let Some(north) = maze.neighbours(member).get(&North) {
                             maze.link(member, &north);
                         }

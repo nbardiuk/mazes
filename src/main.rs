@@ -3,7 +3,6 @@ use sidewinder::Sidewinder;
 
 mod binary_tree;
 mod maze;
-mod rand;
 mod sidewinder;
 
 fn main() {
