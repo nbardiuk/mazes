@@ -1,6 +1,6 @@
 use crate::maze::Direction::{East, North};
 use crate::maze::Maze;
-use rand::seq::SliceRandom;
+use rand::seq::IteratorRandom;
 use rand::{thread_rng, Rng};
 
 pub struct BinaryTree;
@@ -8,20 +8,17 @@ impl BinaryTree {
     pub fn on(mut maze: Maze) -> Maze {
         let rng = &mut thread_rng();
         for cell in maze.cells() {
-            let neighbours = maze
-                .neighbours(&cell)
-                .into_iter()
-                .filter(|(direction, _)| [North, East].contains(direction))
-                .map(|(_, neighbour)| neighbour)
-                .collect::<Vec<_>>();
+            let mut neighbours = maze.neighbours(&cell);
+            neighbours.retain(|direction, _| [North, East].contains(direction));
 
-            if let Some(neighbour) = neighbours.choose(rng) {
+            if let Some(neighbour) = neighbours.values().choose(rng) {
                 maze.link(&cell, &neighbour);
             }
         }
         maze
     }
 }
+
 #[cfg(test)]
 mod spec {
     use super::*;
