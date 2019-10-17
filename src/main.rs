@@ -5,6 +5,8 @@ mod binary_tree;
 mod maze;
 mod sidewinder;
 
-fn main() {
-    println!("{}", Sidewinder::on(Maze::new(27, 8)));
+fn main() -> std::io::Result<()> {
+    let maze = Sidewinder::on(Maze::new(150, 100));
+    svg::save("image.svg", &maze.to_svg(10))?;
+    Ok(())
 }

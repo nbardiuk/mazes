@@ -64,7 +64,7 @@ mod spec {
         let maze = Sidewinder::on(maze);
 
         for cell in maze.cells() {
-            assert_ne!(maze.links(cell).len(), 0);
+            assert_ne!(maze.links(&cell).len(), 0);
         }
     }
 }

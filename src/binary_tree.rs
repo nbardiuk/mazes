@@ -48,7 +48,7 @@ mod spec {
         let maze = BinaryTree::on(maze);
 
         for cell in maze.cells() {
-            assert_ne!(maze.links(cell).len(), 0);
+            assert_ne!(maze.links(&cell).len(), 0);
         }
     }
 }

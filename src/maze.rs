@@ -1,5 +1,8 @@
 use std::collections::HashMap;
 use std::fmt;
+use svg::node::element::path::Data;
+use svg::node::element::Path;
+use svg::Document;
 
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 pub enum Direction {
@@ -82,14 +85,14 @@ impl Maze {
         self.links[n].push(c);
     }
 
-    pub fn links(&self, cell: Cell) -> Vec<Cell> {
+    pub fn links(&self, cell: &Cell) -> Vec<Cell> {
         self.links[cell.y * self.width + cell.x]
             .iter()
             .map(|index| Cell::new(index % self.width, index / self.width))
             .collect()
     }
 
-    fn is_linked(&self, cell: Cell, direction: Direction) -> bool {
+    fn is_linked(&self, cell: &Cell, direction: Direction) -> bool {
         if let Some(neighbour) = self.neighbours(&cell).get(&direction) {
             self.links(cell).contains(neighbour)
         } else {
@@ -98,12 +101,51 @@ impl Maze {
     }
 }
 
+impl Maze {
+    pub fn to_svg(&self, cell_size: usize) -> Document {
+        let mut data = Data::new();
+        for cell in self.cells() {
+            let x1 = cell.x * cell_size;
+            let y1 = cell.y * cell_size;
+            let x2 = (cell.x + 1) * cell_size;
+            let y2 = (cell.y + 1) * cell_size;
+
+            let neighbours = self.neighbours(&cell);
+            if !neighbours.contains_key(&Direction::North) {
+                data = data.move_to((x1, y1)).line_to((x2, y1));
+            }
+            if !neighbours.contains_key(&Direction::West) {
+                data = data.move_to((x1, y1)).line_to((x1, y2));
+            }
+            if !self.is_linked(&cell, Direction::East) {
+                data = data.move_to((x2, y1)).line_to((x2, y2));
+            }
+            if !self.is_linked(&cell, Direction::South) {
+                data = data.move_to((x1, y2)).line_to((x2, y2));
+            }
+        }
+
+        let path = Path::new()
+            .set("fill", "none")
+            .set("stroke", "black")
+            .set("stroke-width", 1)
+            .set("d", data);
+
+        Document::new()
+            .set(
+                "viewBox",
+                (0, 0, cell_size * self.width, cell_size * self.height),
+            )
+            .add(path)
+    }
+}
+
 impl fmt::Display for Maze {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for y in 0..self.height {
             for x in 0..self.width {
                 write!(f, "+")?;
-                if self.is_linked(Cell::new(x, y), Direction::North) {
+                if self.is_linked(&Cell::new(x, y), Direction::North) {
                     write!(f, "   ")?;
                 } else {
                     write!(f, "---")?;
@@ -112,7 +154,7 @@ impl fmt::Display for Maze {
             writeln!(f, "+")?;
 
             for x in 0..self.width {
-                if self.is_linked(Cell::new(x, y), Direction::West) {
+                if self.is_linked(&Cell::new(x, y), Direction::West) {
                     write!(f, " ")?;
                 } else {
                     write!(f, "|")?;
@@ -228,16 +270,16 @@ mod spec {
     fn maze_links_cells() {
         let mut maze = Maze::new(3, 4);
 
-        assert_eq!(maze.links(Cell::new(0, 0)), vec![]);
+        assert_eq!(maze.links(&Cell::new(0, 0)), vec![]);
 
         maze.link(&Cell::new(0, 0), &Cell::new(0, 1));
-        assert_eq!(maze.links(Cell::new(0, 1)), vec![Cell::new(0, 0)]);
-        assert_eq!(maze.links(Cell::new(0, 0)), vec![Cell::new(0, 1)]);
+        assert_eq!(maze.links(&Cell::new(0, 1)), vec![Cell::new(0, 0)]);
+        assert_eq!(maze.links(&Cell::new(0, 0)), vec![Cell::new(0, 1)]);
 
         maze.link(&Cell::new(0, 0), &Cell::new(1, 0));
-        assert_eq!(maze.links(Cell::new(0, 1)), vec![Cell::new(0, 0)]);
+        assert_eq!(maze.links(&Cell::new(0, 1)), vec![Cell::new(0, 0)]);
         assert_eq!(
-            maze.links(Cell::new(0, 0)),
+            maze.links(&Cell::new(0, 0)),
             vec![Cell::new(0, 1), Cell::new(1, 0)]
         );
     }
