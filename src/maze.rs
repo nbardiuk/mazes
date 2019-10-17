@@ -112,16 +112,16 @@ impl Maze {
 
             let neighbours = self.neighbours(&cell);
             if !neighbours.contains_key(&Direction::North) {
-                data = data.move_to((x1, y1)).line_to((x2, y1));
+                data = data.move_to((x1, y1)).horizontal_line_by(cell_size);
             }
             if !neighbours.contains_key(&Direction::West) {
-                data = data.move_to((x1, y1)).line_to((x1, y2));
+                data = data.move_to((x1, y1)).vertical_line_by(cell_size);
             }
             if !self.is_linked(&cell, Direction::East) {
-                data = data.move_to((x2, y1)).line_to((x2, y2));
+                data = data.move_to((x2, y1)).vertical_line_by(cell_size);
             }
             if !self.is_linked(&cell, Direction::South) {
-                data = data.move_to((x1, y2)).line_to((x2, y2));
+                data = data.move_to((x1, y2)).horizontal_line_by(cell_size);
             }
         }
 
