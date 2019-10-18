@@ -40,13 +40,9 @@ impl Maze {
     }
 
     pub fn cells(&self) -> Vec<Cell> {
-        let mut result = vec![];
-        for y in 0..self.height {
-            for x in 0..self.width {
-                result.push(Cell::new(x, y));
-            }
-        }
-        result
+        (0..self.height * self.width)
+            .map(|index| self.cell(&index))
+            .collect()
     }
 
     pub fn rows(&self) -> Vec<Vec<Cell>> {
@@ -78,23 +74,35 @@ impl Maze {
         result
     }
 
-    pub fn link(&mut self, cell: &Cell, neighbour: &Cell) {
-        let c = cell.y * self.width + cell.x;
-        let n = neighbour.y * self.width + neighbour.x;
-        self.links[c].push(n);
-        self.links[n].push(c);
+    fn index(&self, cell: &Cell) -> usize {
+        cell.y * self.width + cell.x
+    }
+
+    fn cell(&self, index: &usize) -> Cell {
+        Cell::new(index % self.width, index / self.width)
+    }
+
+    pub fn link(&mut self, a: &Cell, b: &Cell) {
+        let ia = self.index(a);
+        let ib = self.index(b);
+        self.links[ia].push(ib);
+        self.links[ib].push(ia);
     }
 
     pub fn links(&self, cell: &Cell) -> Vec<Cell> {
-        self.links[cell.y * self.width + cell.x]
+        self.links[self.index(cell)]
             .iter()
-            .map(|index| Cell::new(index % self.width, index / self.width))
+            .map(|index| self.cell(index))
             .collect()
+    }
+
+    fn are_linked(&self, a: &Cell, b: &Cell) -> bool {
+        self.links[self.index(a)].contains(&self.index(b))
     }
 
     fn is_linked(&self, cell: &Cell, direction: Direction) -> bool {
         if let Some(neighbour) = self.neighbours(&cell).get(&direction) {
-            self.links(cell).contains(neighbour)
+            self.are_linked(cell, neighbour)
         } else {
             false
         }
