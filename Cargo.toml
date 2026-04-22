@@ -5,5 +5,5 @@ authors = ["Nazarii Bardiuk <nazarii@bardiuk.com>"]
 edition = "2018"
 
 [dependencies]
-rand = "0.7.2"
+rand = "0.8.6"
 svg = "0.6.0"
